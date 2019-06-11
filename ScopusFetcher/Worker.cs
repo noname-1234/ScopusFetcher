@@ -3,7 +3,7 @@ using System.Data;
 using System.IO;
 using System.Threading;
 
-namespace SopusFetcher
+namespace ScopusFetcher
 {
     public enum SearchType
     {

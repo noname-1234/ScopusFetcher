@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SopusFetcher.Properties
+namespace ScopusFetcher.Properties
 {
 
 

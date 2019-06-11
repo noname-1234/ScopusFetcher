@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace SopusFetcher
+namespace ScopusFetcher
 {
     public partial class MainForm : Form
     {

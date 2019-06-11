@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-namespace SopusFetcher
+namespace ScopusFetcher
 {
     public class Crawler
     {

@@ -1,4 +1,4 @@
-﻿namespace SopusFetcher
+﻿namespace ScopusFetcher
 {
     partial class MainForm
     {

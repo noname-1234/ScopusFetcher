@@ -3,7 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 
-namespace SopusFetcher
+namespace ScopusFetcher
 {
     public class Utils
     {

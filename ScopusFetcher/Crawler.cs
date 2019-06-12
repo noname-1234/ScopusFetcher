@@ -49,6 +49,12 @@ namespace ScopusFetcher
 
         public bool ClickAll()
         {
+            if (pendoGuideBannerExist && elementExist(By.Id("_pendo-close-guide_")))
+            {
+                click(By.Id("_pendo-close-guide_"));
+                pendoGuideBannerExist = false;
+            }
+
             if (!elementExist(By.Id("selectAllCheck")))
             {
                 return false;
@@ -62,12 +68,6 @@ namespace ScopusFetcher
         {
             click(By.Id("export_results"));
             click(By.CssSelector("label[for='CSV']"));
-
-            if (pendoGuideBannerExist && elementExist(By.Id("_pendo-close-guide_")))
-            {
-                click(By.Id("_pendo-close-guide_"));
-                pendoGuideBannerExist = false;
-            }
 
             if (!extraExportInfoChecked)
             {

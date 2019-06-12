@@ -58,6 +58,12 @@ namespace ScopusFetcher
             t.Start();
         }
 
+        public void Close()
+        {
+            try { crawler.Close(); } catch { }
+            crawler = null;
+        }
+
         private delegate void SendMsgDelegate(string msg);
         private void downloadStep()
         {
@@ -70,54 +76,63 @@ namespace ScopusFetcher
             int successCount = 0;
             int failCount = 0;
 
-            foreach (DataRow row in worksheet.Rows)
+            try
             {
-                string EID = row[param.EIDColumnName].ToString();
-                string code = row[param.CodeColumnName].ToString();
-
-                string downloadFileNameSuffix = (searchType == SearchType.EID) ? "_reference" : "_citation";
-                string downloadFileName = $"{code}{downloadFileNameSuffix}";
-
-                MainForm.Mainform.Invoke(dg, $"開始下載檔案: EID '{EID}', 編號 '{code}'");
-
-                crawler.Query($"{searchFunc}({EID})");
-                crawler.Wait();
-
-                bool success = crawler.ClickAll();
-
-                if (!success)
+                foreach (DataRow row in worksheet.Rows)
                 {
-                    goto Failed;
-                }
+                    string EID = row[param.EIDColumnName].ToString();
+                    string code = row[param.CodeColumnName].ToString();
 
-                if (searchType == SearchType.EID)
-                {
-                    crawler.CheckRef();
-                    success = crawler.ClickAll();
+                    string downloadFileNameSuffix = (searchType == SearchType.EID) ? "_reference" : "_citation";
+                    string downloadFileName = $"{code}{downloadFileNameSuffix}";
+
+                    MainForm.Mainform.Invoke(dg, $"開始下載檔案: EID '{EID}', 編號 '{code}'");
+
+                    crawler.Query($"{searchFunc}({EID})");
+                    crawler.Wait();
+
+                    bool success = crawler.ClickAll();
 
                     if (!success)
                     {
                         goto Failed;
                     }
+
+                    if (searchType == SearchType.EID)
+                    {
+                        crawler.CheckRef();
+                        success = crawler.ClickAll();
+
+                        if (!success)
+                        {
+                            goto Failed;
+                        }
+                    }
+
+                    crawler.DownloadCSV(downloadFileName);
+                    successCount += 1;
+                    MainForm.Mainform.Invoke(dg, $"下載檔案 {downloadFileName}.csv 完成");
+
+                End:
+                    crawler.ReturnSearchPage();
+                    crawler.Wait();
+                    continue;
+
+                Failed:
+                    failCount += 1;
+                    MainForm.Mainform.Invoke(dg, $"下載檔案 {downloadFileName}.csv 失敗");
+                    goto End;
                 }
-
-                crawler.DownloadCSV(downloadFileName);
-                successCount += 1;
-                MainForm.Mainform.Invoke(dg, $"下載檔案 {downloadFileName}.csv 完成");
-
-            End:
-                crawler.ReturnSearchPage();
-                crawler.Wait();
-                continue;
-
-            Failed:
-                failCount += 1;
-                MainForm.Mainform.Invoke(dg, $"下載檔案 {downloadFileName}.csv 失敗");
-                goto End;
+            }
+            catch (Exception ex)
+            {
+                MainForm.Mainform.Invoke(dg, $"錯誤: {ex.Message}");
+                Close();
+                return;
             }
 
-            crawler.Close();
             MainForm.Mainform.Invoke(dg, $"全部下載完成: 共 {successCount} 份檔案, {failCount} 份無法下載");
+            Close();
         }
     }
 }

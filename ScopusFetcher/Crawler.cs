@@ -32,7 +32,7 @@ namespace ScopusFetcher
         public void OpenPage()
         {
             driver.Navigate().GoToUrl(scopusUrl);
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(12);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(55);
         }
 
         public void Query(string QueryString)
@@ -49,15 +49,17 @@ namespace ScopusFetcher
 
         public bool ClickAll()
         {
+            IWebElement resFormFirstDiv = driver.FindElement(By.XPath("//form[@id='searchResFormId']/div[1]"));
+            string clsOfFirstDiv = resFormFirstDiv.GetAttribute("class");
+            if (clsOfFirstDiv == "displayNone")
+            {
+                return false;
+            }
+
             if (pendoGuideBannerExist && elementExist(By.Id("_pendo-close-guide_")))
             {
                 click(By.Id("_pendo-close-guide_"));
                 pendoGuideBannerExist = false;
-            }
-
-            if (!elementExist(By.Id("selectAllCheck")))
-            {
-                return false;
             }
 
             click(By.Id("selectAllCheck"));
@@ -93,7 +95,7 @@ namespace ScopusFetcher
 
         public void Close()
         {
-            driver.Close();
+            driver.Quit();
         }
 
         public void ReturnSearchPage()

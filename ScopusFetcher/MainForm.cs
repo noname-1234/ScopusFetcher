@@ -6,6 +6,7 @@ namespace ScopusFetcher
     public partial class MainForm : Form
     {
         public static MainForm Mainform { get; set; }
+        public Worker worker { get; set; }
 
         public MainForm()
         {
@@ -46,14 +47,14 @@ namespace ScopusFetcher
                 EIDColumnName = tbEIDCol.Text
             };
 
-            Worker worker = new Worker(filePath, downloadPath, sendMsg, (EID.Checked) ? SearchType.EID : SearchType.REFEID, param, (int)nudDelay.Value);
+            worker = new Worker(filePath, downloadPath, sendMsg, (EID.Checked) ? SearchType.EID : SearchType.REFEID, param, (int)nudDelay.Value);
             try
             {
                 worker.Download();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"錯誤: {ex.Message}", "錯誤");
+                sendMsg($"錯誤: {ex.Message}");
             }
         }
 
@@ -100,8 +101,17 @@ namespace ScopusFetcher
             }
 
             console.SelectionStart = console.Text.Length;
-            // scroll it automatically
             console.ScrollToCaret();
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            try { worker.Close(); } catch { }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            sendMsg("關閉程式");
         }
     }
 }
